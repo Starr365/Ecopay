@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Wallet, Zap, Shield, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { apiService } from "@/lib/api";
 
 interface ExtendedWindow extends Window {
   celo?: unknown;
@@ -72,9 +73,20 @@ export default function WalletConnect({ onConnect, onProceed, isConnecting = fal
       // Simulate connection process
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Call the onConnect callback
-      onConnect();
-      setConnectingWallet(null);
+      // Generate a mock wallet address for demo purposes
+      const mockAddress = `0x742d35Cc6634C0532925a3b844Bc454e4438f44e`;
+
+      // Call the API to connect wallet
+      const result = await apiService.connectWallet(mockAddress);
+
+      if (result.success) {
+        // Call the onConnect callback
+        onConnect();
+        setConnectingWallet(null);
+      } else {
+        console.error('Wallet connection failed:', result.error);
+        setConnectingWallet(null);
+      }
     } catch (error) {
       console.error('Wallet connection failed:', error);
       setConnectingWallet(null);

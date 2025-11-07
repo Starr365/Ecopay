@@ -69,7 +69,7 @@ export default function Hero({ onSignup }: HeroProps) {
           className="animate-slide-in-up"
         >
           <motion.h1
-            className="text-5xl md:text-7xl font-bold text-off-white mb-8 leading-tight animate-fade-in-scale"
+            className="text-5xl mt-4 md:text-7xl font-bold text-off-white mb-8 leading-tight animate-fade-in-scale"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { User, Mail, Lock, Camera, LogOut, Save, X } from "lucide-react";
+import { apiService } from "@/lib/api";
 
 interface SettingsTabProps {
   userName: string;
@@ -263,6 +264,11 @@ export default function SettingsTab({
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
           </motion.button>
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-xs text-off-white/60">
+            Logging out will clear your session and redirect you to the home page.
+          </p>
         </div>
       </motion.div>
     </motion.div>

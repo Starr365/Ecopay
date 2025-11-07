@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TrendingUp, Award, ArrowUpRight, ArrowDownLeft, Target, Receipt } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import CarbonFootprintTab from "@/components/dashboard/CarbonFootprintTab";
 import AchievementsTab from "@/components/dashboard/AchievementsTab";
 import SettingsTab from "@/components/dashboard/SettingsTab";
 import QuickActions from "@/components/dashboard/QuickActions";
+import { apiService, User } from "@/lib/api";
 
 const quickStats = [
   { label: "Total Saved", value: "₦85,000", change: "+15%", icon: TrendingUp },
@@ -45,8 +46,10 @@ const achievements = [
 
 export default function Dashboard() {
   const [showWalletConnect, setShowWalletConnect] = useState(false);
-  const [activeTab, setActiveTab] = useState('home-dashboard');
+  const [activeTab, setActiveTab] = useState('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const handleWalletConnect = () => {
@@ -63,9 +66,7 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    // Clear any stored authentication data
-    localStorage.removeItem('authToken');
-    sessionStorage.clear();
+    apiService.logout();
     // Redirect to home page
     router.push('/');
   };
@@ -80,13 +81,44 @@ export default function Dashboard() {
     // Handle avatar upload here
   };
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const result = await apiService.getUserProfile();
+        if (result.success && result.data) {
+          setUserProfile(result.data);
+        } else {
+          // If profile fetch fails, redirect to auth
+          router.push('/auth');
+        }
+      } catch (error) {
+        router.push('/auth');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-linear-neon-dark flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-off-white">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (showWalletConnect) {
     return <WalletConnect onConnect={handleWalletConnected} />;
   }
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'home-dashboard':
+      case 'overview':
         return (
           <motion.div
             key="overview"
@@ -189,8 +221,8 @@ export default function Dashboard() {
             transition={{ duration: 0.3 }}
           >
             <SettingsTab
-              userName="Sarah Johnson"
-              userEmail="sarah.johnson@email.com"
+              userName={userProfile?.name || "User"}
+              userEmail={userProfile?.email || ""}
               onLogout={handleLogout}
               onUpdateProfile={handleUpdateProfile}
               onUpdateAvatar={handleUpdateAvatar}
@@ -213,15 +245,15 @@ export default function Dashboard() {
           isMobile={true}
           isOpen={isMobileMenuOpen}
           onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          userName="Sarah Johnson"
+          userName={userProfile?.name || "User"}
           onWalletConnect={handleWalletConnect}
         />
 
         {/* Header */}
         <DashboardHeader
-          userName="Sarah Johnson"
-          walletAddress="0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
-          balance="₦125,000"
+          userName={userProfile?.name || "User"}
+          walletAddress={userProfile?.walletAddress || ""}
+          balance={`₦${userProfile?.balance?.toLocaleString() || "0"}`}
           onWalletConnect={handleWalletConnect}
         />
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiService, CarbonProject } from "@/lib/api";
 import {
   TrendingUp,
   Award,
@@ -124,17 +125,63 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [contributionAmount, setContributionAmount] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState<'cUSD' | 'cEUR'>('cUSD');
+  const [apiProjects, setApiProjects] = useState<CarbonProject[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [projectsError, setProjectsError] = useState<string | null>(null);
 
   const handleContribute = (projectId: string) => {
     setSelectedProject(projectId);
   };
 
-  const handleConfirmContribution = () => {
-    // Handle contribution logic here
-    console.log('Contributing to:', selectedProject, 'Amount:', contributionAmount, 'Currency:', selectedCurrency);
-    setSelectedProject(null);
-    setContributionAmount('');
+  const handleConfirmContribution = async () => {
+    if (!selectedProject || !contributionAmount) return;
+
+    try {
+      const result = await apiService.offsetProject({
+        projectId: selectedProject,
+        amount: parseFloat(contributionAmount)
+      });
+
+      if (result.success) {
+        console.log('Contribution successful:', result.data);
+        // Refresh projects or show success message
+        setSelectedProject(null);
+        setContributionAmount('');
+      } else {
+        console.error('Contribution failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Contribution error:', error);
+    }
   };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const result = await apiService.getAllProjects();
+        if (result.success && result.data) {
+          setApiProjects(result.data);
+        } else {
+          setProjectsError(result.error || 'Failed to load projects');
+        }
+      } catch (err) {
+        setProjectsError('Failed to load projects');
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const allProjects = [...apiProjects.map(project => ({
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    contributors: Math.floor(Math.random() * 1000) + 100, // Mock contributor count
+    priority: project.id === 'celo-climate' ? true : false,
+    icon: '🌿'
+  })), ...climateProjects];
 
   return (
     <motion.div
@@ -299,62 +346,79 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
       >
         <h3 className="text-xl font-semibold text-off-white neon-text mb-6">Climate Projects</h3>
         <div className="grid gap-4">
-          {climateProjects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-              className={`glass rounded-xl p-6 hover-lift ${project.priority ? 'border border-primary/30' : ''}`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start space-x-4">
-                  <div className="text-3xl">{project.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h4 className="text-lg font-semibold text-off-white">{project.name}</h4>
-                      {project.priority && (
-                        <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">
-                          Priority
+          {isLoadingProjects ? (
+            <div className="text-center py-8">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-off-white/70">Loading climate projects...</p>
+            </div>
+          ) : projectsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-400 mb-4">{projectsError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            allProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                className={`glass rounded-xl p-6 hover-lift ${project.priority ? 'border border-primary/30' : ''}`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="text-3xl">{project.icon}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h4 className="text-lg font-semibold text-off-white">{project.name}</h4>
+                        {project.priority && (
+                          <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">
+                            Priority
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-off-white/70 text-sm mb-3">{project.description}</p>
+                      <div className="flex items-center space-x-4 text-xs text-off-white/60">
+                        <span className="flex items-center">
+                          <Users className="w-3 h-3 mr-1" />
+                          {project.contributors.toLocaleString()} contributors
                         </span>
-                      )}
-                    </div>
-                    <p className="text-off-white/70 text-sm mb-3">{project.description}</p>
-                    <div className="flex items-center space-x-4 text-xs text-off-white/60">
-                      <span className="flex items-center">
-                        <Users className="w-3 h-3 mr-1" />
-                        {project.contributors.toLocaleString()} contributors
-                      </span>
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <button className="text-off-white/60 hover:text-primary transition-colors">
+                      <Info className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button className="text-off-white/60 hover:text-primary transition-colors">
-                    <Info className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-off-white/60">
-                  Demo / Mock contribution — verify before live integration
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-off-white/60">
+                    Demo / Mock contribution — verify before live integration
+                  </div>
+                  <div className="flex space-x-2">
+                    <motion.button
+                      onClick={() => handleContribute(project.id)}
+                      className="px-4 py-2 bg-secondary text-black hover:bg-success font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Contribute
+                    </motion.button>
+                    <button className="px-4 py-2 border border-off-white/20 text-off-white/70 hover:text-primary hover:border-primary/50 rounded-lg transition-colors">
+                      Learn More
+                    </button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <motion.button
-                    onClick={() => handleContribute(project.id)}
-                    className="px-4 py-2 bg-secondary text-black hover:bg-success font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Contribute
-                  </motion.button>
-                  <button className="px-4 py-2 border border-off-white/20 text-off-white/70 hover:text-primary hover:border-primary/50 rounded-lg transition-colors">
-                    Learn More
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
       </motion.div>
 

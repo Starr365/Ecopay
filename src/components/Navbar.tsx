@@ -46,7 +46,7 @@ export default function Navbar({ onSignup }: NavbarProps) {
               onClick={onSignup}
               className="bg-secondary text-black hover:bg-success px-6 py-2 rounded-full transition-all duration-300 font-medium shadow-md hover:shadow-lg"
             >
-              Sign Up
+              Sign In
             </Button>
           </div>
 

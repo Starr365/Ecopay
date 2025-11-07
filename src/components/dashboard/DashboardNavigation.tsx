@@ -63,20 +63,24 @@ export default function DashboardNavigation({
           initial={{ x: -300 }}
           animate={{ x: isOpen ? 0 : -300 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed left-0 top-0 h-full w-64 bg-linear-neon-dark/95 backdrop-blur-md border-r border-primary/20 z-40 lg:hidden"
+          className="fixed left-0 top-0 h-full w-72 bg-linear-neon-dark/95 backdrop-blur-md border-r border-primary/20 z-40 lg:hidden"
         >
-          <div className="p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <Zap className="w-4 h-4 text-black" />
-              </div>
-              <span className="text-lg font-bold text-primary">ecopay</span>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <motion.button
+                onClick={onToggle}
+                className="p-1 text-off-white/70 hover:text-primary transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <X className="w-4 h-4" />
+              </motion.button>
             </div>
-            <div className="mb-8">
-              <p className="text-off-white/70 text-sm">Hi, {userName}</p>
+            <div className="mb-6">
+              <p className="text-off-white/70 text-xs">Hi, {userName}</p>
             </div>
 
-            <nav className="space-y-2">
+            <nav className="space-y-1">
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.id}
@@ -84,7 +88,7 @@ export default function DashboardNavigation({
                     onTabChange(tab.id);
                     onToggle?.();
                   }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  className={`w-full flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm ${
                     activeTab === tab.id
                       ? 'bg-primary/20 text-primary border border-primary/30'
                       : 'text-off-white/70 hover:text-primary hover:bg-primary/10'
@@ -92,8 +96,8 @@ export default function DashboardNavigation({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <tab.icon className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
+                  <tab.icon className="w-4 h-4" />
+                  <span className="font-medium text-sm">{tab.label}</span>
                 </motion.button>
               ))}
 
@@ -103,12 +107,12 @@ export default function DashboardNavigation({
                   onWalletConnect?.();
                   onToggle?.();
                 }}
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-all duration-200 mt-4 border border-accent/30"
+                className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-all duration-200 mt-4 border border-accent/30 text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Wallet className="w-5 h-5" />
-                <span className="font-medium">Connect Celo Wallet</span>
+                <Wallet className="w-4 h-4" />
+                <span className="font-medium text-sm">Connect Celo Wallet</span>
               </motion.button>
             </nav>
           </div>

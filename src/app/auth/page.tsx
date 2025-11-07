@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Wallet, Mail, Lock, User, ArrowRight, Check } from "lucide-react";
+import { apiService } from "@/lib/api";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,7 @@ export default function AuthPage() {
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,12 +28,44 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      if (isLogin) {
+        const result = await apiService.login({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (result.success) {
+          router.push('/dashboard');
+        } else {
+          setError(result.error || 'Login failed');
+        }
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match');
+          setIsLoading(false);
+          return;
+        }
+
+        const result = await apiService.register({
+          fullName: formData.name,
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (result.success) {
+          router.push('/dashboard');
+        } else {
+          setError(result.error || 'Registration failed');
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 1500);
+    }
   };
 
   const toggleMode = () => {
@@ -42,6 +76,7 @@ export default function AuthPage() {
       password: "",
       confirmPassword: "",
     });
+    setError(null);
   };
 
   return (
@@ -72,6 +107,17 @@ export default function AuthPage() {
             }
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-center"
+          >
+            {error}
+          </motion.div>
+        )}
 
         {/* Auth Form */}
         <motion.form

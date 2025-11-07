@@ -1,0 +1,303 @@
+{
+	"info": {
+		"_postman_id": "284ad02c-f92f-4415-bb03-6797b4933354",
+		"name": "greenpay",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39710093",
+		"_collection_link": "https://universal-meadow-664750.postman.co/workspace/3a85a16e-1fc9-423b-8bd7-d23b31c484c1/collection/41131861-284ad02c-f92f-4415-bb03-6797b4933354?action=share&source=collection_link&creator=39710093"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fullName\": \"Miracle Collins\",\n    \"email\": \"miracle@gmail.com\",\n    \"password\": \"Pyr@hornet0101\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}auth/signup",
+					"host": [
+						"{{apiurl}}auth"
+					],
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"hoyx0101@gmail.com\",\n    \"password\": \"Pyr@hornet0101\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}auth/signin",
+					"host": [
+						"{{apiurl}}auth"
+					],
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "make transactions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Order an uber\",\n    \"amount\": 3000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}transactions",
+					"host": [
+						"{{apiurl}}transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get transactions",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "add user balance",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTA5YzJlNWVkMDEwNjllZDFkMmJiOTQiLCJpYXQiOjE3NjIyNDczOTgsImV4cCI6MTc2MjUwNjU5OH0.l2Swdje695Al20z4y_sQV_ZnST6eJxFjdVft3skvF2A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 1600\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}users/balance",
+					"host": [
+						"{{apiurl}}users"
+					],
+					"path": [
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user profile",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "create savings",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTA5YzJlNWVkMDEwNjllZDFkMmJiOTQiLCJpYXQiOjE3NjIyNDczOTgsImV4cCI6MTc2MjUwNjU5OH0.l2Swdje695Al20z4y_sQV_ZnST6eJxFjdVft3skvF2A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Buy a mercedes benz\",\n    \"target\": 20000,\n    \"due\": \"2024-01-10T00:00:00.000Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}savings",
+					"host": [
+						"{{apiurl}}savings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get savings",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "add saving money",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTA5YzJlNWVkMDEwNjllZDFkMmJiOTQiLCJpYXQiOjE3NjIyNDczOTgsImV4cCI6MTc2MjUwNjU5OH0.l2Swdje695Al20z4y_sQV_ZnST6eJxFjdVft3skvF2A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}savings/6909e906000fdb57ce8191f3",
+					"host": [
+						"{{apiurl}}savings"
+					],
+					"path": [
+						"6909e906000fdb57ce8191f3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "connect wallet",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTBiYTNjNjA5ZmE0ZTNmZmE3YWY2MjEiLCJpYXQiOjE3NjIzNzA1MDIsImV4cCI6MTc2MjYyOTcwMn0.qqmH6ejuMMbv6I79J36J05zahu8IZKWexvi-fTmQ3KE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"address\": \"0x38249382923727742\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}auth/wallet",
+					"host": [
+						"{{apiurl}}auth"
+					],
+					"path": [
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"GreenField\",\n    \"description\": \"Fronting the goal of afforesattion\",\n    \"impact\": \"Planted 40 trees in Mexico\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiurl}}projects",
+					"host": [
+						"{{apiurl}}projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "offset project",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{apiurl}}projects",
+					"host": [
+						"{{apiurl}}projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all project",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

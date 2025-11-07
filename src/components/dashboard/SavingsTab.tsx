@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { apiService, SavingsGoal } from "@/lib/api";
 
-interface SavingsGoal {
+interface LocalSavingsGoal {
   name: string;
   target: number;
   current: number;
@@ -12,11 +14,79 @@ interface SavingsGoal {
 }
 
 interface SavingsTabProps {
-  goals: SavingsGoal[];
+  goals: LocalSavingsGoal[];
   onAddGoal?: () => void;
 }
 
 export default function SavingsTab({ goals, onAddGoal }: SavingsTabProps) {
+  const [apiSavings, setApiSavings] = useState<SavingsGoal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSavings = async () => {
+      try {
+        const result = await apiService.getSavings();
+        if (result.success && result.data) {
+          setApiSavings(result.data);
+        } else {
+          setError(result.error || 'Failed to load savings');
+        }
+      } catch (err) {
+        setError('Failed to load savings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSavings();
+  }, []);
+
+  const allGoals = [...apiSavings.map(saving => ({
+    name: saving.name,
+    target: saving.target,
+    current: saving.current,
+    deadline: saving.deadline,
+    color: '#00FF9C' // Default color for API savings
+  })), ...goals];
+
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="glass rounded-2xl p-6"
+      >
+        <div className="text-center py-8">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-off-white/70">Loading savings goals...</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="glass rounded-2xl p-6"
+      >
+        <div className="text-center py-8">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +107,7 @@ export default function SavingsTab({ goals, onAddGoal }: SavingsTabProps) {
       </div>
 
       <div className="space-y-4">
-        {goals.map((goal, index) => {
+        {allGoals.map((goal, index) => {
           const progress = (goal.current / goal.target) * 100;
           const remaining = goal.target - goal.current;
           const daysLeft = Math.ceil((new Date(goal.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));

@@ -2,9 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowDownLeft, Award, Receipt } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiService, Transaction } from "@/lib/api";
 
-interface Transaction {
+interface LocalTransaction {
   id: number;
   type: string;
   description: string;
@@ -15,22 +16,91 @@ interface Transaction {
 }
 
 interface TransactionsTabProps {
-  transactions: Transaction[];
+  transactions: LocalTransaction[];
 }
 
 export default function TransactionsTab({ transactions }: TransactionsTabProps) {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [apiTransactions, setApiTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const filters = ['All', 'Sent', 'Received', 'Offset'];
 
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const result = await apiService.getTransactions();
+        if (result.success && result.data) {
+          setApiTransactions(result.data);
+        } else {
+          setError(result.error || 'Failed to load transactions');
+        }
+      } catch (err) {
+        setError('Failed to load transactions');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const allTransactions = [...apiTransactions.map(tx => ({
+    id: parseInt(tx.id),
+    type: tx.type,
+    description: tx.description,
+    amount: `₦${tx.amount.toLocaleString()}`,
+    time: new Date(tx.time).toLocaleDateString(),
+    icon: tx.type === 'sent' ? ArrowUpRight : tx.type === 'received' ? ArrowDownLeft : tx.type === 'offset' ? Award : Receipt,
+    fee: tx.fee ? `₦${tx.fee.toLocaleString()}` : 'Free'
+  })), ...transactions];
+
   const filteredTransactions = activeFilter === 'All'
-    ? transactions
-    : transactions.filter(tx => {
+    ? allTransactions
+    : allTransactions.filter(tx => {
         if (activeFilter === 'Sent') return tx.type === 'sent';
         if (activeFilter === 'Received') return tx.type === 'received';
         if (activeFilter === 'Offset') return tx.type === 'offset';
         return true;
       });
+
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="glass rounded-2xl p-6"
+      >
+        <div className="text-center py-8">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-off-white/70">Loading transactions...</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="glass rounded-2xl p-6"
+      >
+        <div className="text-center py-8">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

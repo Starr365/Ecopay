@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Award, Plus, CreditCard, Target } from "lucide-react";
+import { apiService } from "@/lib/api";
 
 interface QuickActionsProps {
   onAction?: (action: string) => void;
@@ -52,7 +53,23 @@ export default function QuickActions({ onAction }: QuickActionsProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-          onClick={() => onAction?.(action.action)}
+          onClick={async () => {
+            if (action.action === 'add-funds') {
+              try {
+                const result = await apiService.addUserBalance(10000); // Add ₦10,000
+                if (result.success) {
+                  console.log('Funds added successfully');
+                  window.location.reload();
+                } else {
+                  console.error('Failed to add funds:', result.error);
+                }
+              } catch (error) {
+                console.error('Error adding funds:', error);
+              }
+            } else {
+              onAction?.(action.action);
+            }
+          }}
           className={`${action.color} text-black font-semibold rounded-xl hover-lift shadow-lg hover:shadow-xl flex flex-col items-center justify-center p-6 space-y-3 group transition-all duration-300`}
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
