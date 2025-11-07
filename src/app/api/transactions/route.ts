@@ -5,10 +5,7 @@ const proxyHandler = createProxyHandler('transactions');
 
 export async function GET(request: NextRequest) {
   // Return mock data for development
-  return NextResponse.json({
-    success: true,
-    data: mockResponses.transactions.get
-  });
+  return NextResponse.json(mockResponses.transactions.get);
 }
 
 export async function POST(request: NextRequest) {

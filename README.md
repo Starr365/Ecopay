@@ -1,10 +1,10 @@
-# GreenPay 🌿💚
+# Ecopay 🌿💚
 
 **Carbon Offsetting Reimagined** - A revolutionary platform that seamlessly integrates carbon offsetting into everyday financial transactions, powered by AI-driven analytics and blockchain transparency on the Celo network.
 
-## 🌟 What is GreenPay?
+## 🌟 What is Ecopay?
 
-GreenPay is a cutting-edge fintech application that automatically calculates and offsets carbon emissions from your financial transactions. By connecting your Celo wallet, every payment, transfer, or transaction you make contributes to verified carbon offset projects while earning you GreenPoints and rewards.
+Ecopay is a cutting-edge fintech application that automatically calculates and offsets carbon emissions from your financial transactions. By connecting your Celo wallet, every payment, transfer, or transaction you make contributes to verified carbon offset projects while earning you GreenPoints and rewards.
 
 ### Key Features
 
@@ -35,8 +35,8 @@ GreenPay is a cutting-edge fintech application that automatically calculates and
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/greenpay.git
-   cd greenpay
+   git clone https://github.com/your-username/Ecopay.git
+   cd Ecopay
    ```
 
 2. **Install dependencies**
@@ -77,7 +77,7 @@ src/
 
 ## 🌱 Environmental Impact
 
-GreenPay is committed to making climate action accessible and transparent:
+Ecopay is committed to making climate action accessible and transparent:
 
 - **Real-time Offsetting**: Every transaction contributes to carbon reduction
 - **Verified Projects**: Only supports certified carbon offset initiatives
@@ -98,10 +98,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🌐 Connect
 
-- Website: [greenpay.app](https://greenpay.app)
-- Twitter: [@greenpay](https://twitter.com/greenpay)
-- LinkedIn: [GreenPay](https://linkedin.com/company/greenpay)
-- GitHub: [greenpay](https://github.com/greenpay)
+- Website: [Ecopay.app](https://Ecopay.app)
+- Twitter: [@Ecopay](https://twitter.com/Ecopay)
+- LinkedIn: [Ecopay](https://linkedin.com/company/Ecopay)
+- GitHub: [Ecopay](https://github.com/Ecopay)
 
 ---
 

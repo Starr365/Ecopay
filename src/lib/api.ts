@@ -186,7 +186,9 @@ class ApiService {
   async getTransactions(): Promise<ApiResponse<Transaction[]>> {
     try {
       const response = await this.axiosInstance.get('/transactions');
-      return { success: true, data: response.data };
+      // Handle both wrapped and direct responses
+      const data = response.data?.data || response.data;
+      return { success: true, data: Array.isArray(data) ? data : [] };
     } catch (error) {
       return this.handleError(error);
     }
@@ -225,7 +227,9 @@ class ApiService {
   async getSavings(): Promise<ApiResponse<SavingsGoal[]>> {
     try {
       const response = await this.axiosInstance.get('/savings');
-      return { success: true, data: response.data };
+      // Handle both wrapped and direct responses
+      const data = response.data?.data || response.data;
+      return { success: true, data: Array.isArray(data) ? data : [] };
     } catch (error) {
       return this.handleError(error);
     }
@@ -272,7 +276,9 @@ class ApiService {
   async getAllProjects(): Promise<ApiResponse<CarbonProject[]>> {
     try {
       const response = await this.axiosInstance.get('/projects');
-      return { success: true, data: response.data };
+      // Handle both wrapped and direct responses
+      const data = response.data?.data || response.data;
+      return { success: true, data: Array.isArray(data) ? data : [] };
     } catch (error) {
       return this.handleError(error);
     }

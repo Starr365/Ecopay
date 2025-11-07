@@ -5,10 +5,7 @@ const proxyHandler = createProxyHandler('profile');
 
 export async function GET(request: NextRequest) {
   // Return mock data for development
-  return NextResponse.json({
-    success: true,
-    data: mockResponses.profile
-  });
+  return NextResponse.json(mockResponses.profile);
 }
 
 export async function OPTIONS(request: NextRequest) {
