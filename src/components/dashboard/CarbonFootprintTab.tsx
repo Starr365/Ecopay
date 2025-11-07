@@ -14,7 +14,8 @@ import {
   DollarSign,
   Euro,
   Target,
-  Zap
+  Zap,
+  ArrowUpRight
 } from "lucide-react";
 import {
   LineChart,
@@ -93,6 +94,20 @@ const climateProjects = [
 
 const offsetHistory = [
   {
+    project: 'Transfer Carbon Offset',
+    date: 'Nov 7, 2025',
+    amount: '8.5 kg CO₂e',
+    currency: 'Food transfer',
+    type: 'transfer'
+  },
+  {
+    project: 'Transfer Carbon Offset',
+    date: 'Nov 6, 2025',
+    amount: '12.0 kg CO₂e',
+    currency: 'Transport transfer',
+    type: 'transfer'
+  },
+  {
     project: 'Celo Climate Collective',
     date: 'Nov 2, 2025',
     amount: '50 kg CO₂e',
@@ -118,7 +133,7 @@ const weeklyEmissions = [
   { week: 'Week 3', value: 22 },
   { week: 'Week 4', value: 28 },
   { week: 'Week 5', value: 19 },
-  { week: 'Week 6', value: 25 }
+  { week: 'Week 6', value: 32 } // Increased due to recent transfers
 ];
 
 export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintTabProps) {
@@ -128,30 +143,49 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
   const [apiProjects, setApiProjects] = useState<CarbonProject[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [projectsError, setProjectsError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleContribute = (projectId: string) => {
     setSelectedProject(projectId);
   };
 
   const handleConfirmContribution = async () => {
-    if (!selectedProject || !contributionAmount) return;
+    if (!selectedProject || !contributionAmount || !selectedCurrency) return;
+
+    setIsProcessing(true);
 
     try {
+      const contributionValue = parseFloat(contributionAmount);
+      // Calculate equivalent CO2 offset: 2kg CO2 for every 1 dollar contributed
+      const co2Offset = contributionValue * 2;
+
       const result = await apiService.offsetProject({
         projectId: selectedProject,
-        amount: parseFloat(contributionAmount)
+        amount: contributionValue,
+        currency: selectedCurrency,
+        co2Offset: co2Offset
       });
 
       if (result.success) {
         console.log('Contribution successful:', result.data);
-        // Refresh projects or show success message
+        // Show success message
+        setShowSuccessMessage(true);
         setSelectedProject(null);
         setContributionAmount('');
+        setSelectedCurrency('cUSD');
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 5000);
       } else {
         console.error('Contribution failed:', result.error);
       }
     } catch (error) {
       console.error('Contribution error:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -206,9 +240,9 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
           className="glass rounded-xl p-6 text-center"
         >
           <TrendingUp className="w-8 h-8 text-primary mx-auto mb-3" />
-          <div className="text-2xl font-bold text-primary neon-text mb-1">125 kg</div>
+          <div className="text-2xl font-bold text-primary neon-text mb-1">145 kg</div>
           <div className="text-sm text-off-white/70">Current Month Footprint</div>
-          <div className="text-xs text-off-white/60">CO₂e emissions</div>
+          <div className="text-xs text-off-white/60">CO₂e emissions (+20kg from transfers)</div>
         </motion.div>
 
         <motion.div
@@ -218,9 +252,9 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
           className="glass rounded-xl p-6 text-center"
         >
           <Award className="w-8 h-8 text-accent mx-auto mb-3" />
-          <div className="text-2xl font-bold text-accent neon-text mb-1">225 kg</div>
+          <div className="text-2xl font-bold text-accent neon-text mb-1">245 kg</div>
           <div className="text-sm text-off-white/70">Lifetime Offsets</div>
-          <div className="text-xs text-accent/70">+225 kg this month</div>
+          <div className="text-xs text-accent/70">+245 kg this month (+20kg from transfers)</div>
         </motion.div>
 
         <motion.div
@@ -440,12 +474,23 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
               className="flex items-center justify-between p-4 bg-gradient-neon-glow rounded-lg"
             >
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                  <Award className="w-5 h-5 text-primary" />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  offset.type === 'transfer' ? 'bg-green-500/20' : 'bg-primary/20'
+                }`}>
+                  {offset.type === 'transfer' ? (
+                    <ArrowUpRight className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <Award className="w-5 h-5 text-primary" />
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-off-white">{offset.project}</p>
                   <p className="text-xs text-off-white/60">{offset.date}</p>
+                  {offset.type === 'transfer' && (
+                    <span className="inline-block px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full mt-1">
+                      Auto-offset from transfer
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="text-right">
@@ -467,29 +512,51 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
         <h3 className="text-xl font-semibold text-off-white neon-text mb-6">Your Impact</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-accent neon-text mb-2">225</div>
+            <div className="text-3xl font-bold text-accent neon-text mb-2">245</div>
             <div className="text-sm text-off-white/70">kg CO₂e offset</div>
-            <div className="text-xs text-off-white/60">Equivalent to planting ~11 trees</div>
+            <div className="text-xs text-off-white/60">Equivalent to planting ~12 trees</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary neon-text mb-2">150</div>
+            <div className="text-3xl font-bold text-primary neon-text mb-2">175</div>
             <div className="text-sm text-off-white/70">cUSD</div>
-            <div className="text-xs text-off-white/60">Total Contributions</div>
+            <div className="text-xs text-off-white/60">Total Contributions (+25 from transfers)</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-accent neon-text mb-2">75</div>
+            <div className="text-3xl font-bold text-accent neon-text mb-2">95</div>
             <div className="text-sm text-off-white/70">cEUR</div>
-            <div className="text-xs text-off-white/60">Total Contributions</div>
+            <div className="text-xs text-off-white/60">Total Contributions (+20 from transfers)</div>
           </div>
           <div className="text-center">
             <div className="flex flex-col items-center">
-              <div className="text-2xl mb-1">🥈</div>
-              <div className="text-sm font-bold text-off-white">#124</div>
-              <div className="text-xs text-off-white/70">Silver - 45% to Gold</div>
+              <div className="text-2xl mb-1">🥇</div>
+              <div className="text-sm font-bold text-off-white">#89</div>
+              <div className="text-xs text-off-white/70">Gold - Top 15% contributors</div>
             </div>
           </div>
         </div>
       </motion.div>
+
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+        >
+          <div className="glass rounded-xl p-4 border border-green-500/30 bg-green-500/10">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                <span className="text-green-400 text-lg">✓</span>
+              </div>
+              <div>
+                <p className="text-green-400 font-semibold">Contribution Successful!</p>
+                <p className="text-off-white/70 text-sm">Check your updated ranking on the dashboard</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Contribution Modal */}
       {selectedProject && (
@@ -515,15 +582,20 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-off-white/70 mb-2">
-                  Contribution Amount (kg CO₂e)
+                  Contribution Amount ($)
                 </label>
                 <input
                   type="number"
                   value={contributionAmount}
                   onChange={(e) => setContributionAmount(e.target.value)}
-                  placeholder="Enter amount"
+                  placeholder="Enter amount in dollars"
                   className="w-full glass-neon pl-4 pr-4 py-3 rounded-xl text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
                 />
+                {contributionAmount && (
+                  <p className="text-xs text-off-white/60 mt-1">
+                    Equivalent to offsetting {parseFloat(contributionAmount) * 2} kg of CO₂
+                  </p>
+                )}
               </div>
 
               <div>
@@ -566,11 +638,19 @@ export default function CarbonFootprintTab({ onWalletConnect }: CarbonFootprintT
               </button>
               <motion.button
                 onClick={handleConfirmContribution}
-                className="flex-1 px-4 py-3 bg-secondary text-black hover:bg-success font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                disabled={isProcessing}
+                className="flex-1 px-4 py-3 bg-secondary text-black hover:bg-success font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Confirm Contribution
+                {isProcessing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  'Confirm Contribution'
+                )}
               </motion.button>
             </div>
           </motion.div>

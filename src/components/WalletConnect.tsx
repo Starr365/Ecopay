@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Wallet, Zap, Shield, ArrowRight } from "lucide-react";
+import { Wallet, Zap, Shield, ArrowRight, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { apiService } from "@/lib/api";
+import DemoAccount from "./DemoAccount";
 
 interface ExtendedWindow extends Window {
   celo?: unknown;
@@ -25,6 +26,7 @@ interface WalletConnectProps {
 export default function WalletConnect({ onConnect, onProceed, isConnecting = false, isConnected = false }: WalletConnectProps) {
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [showDownloadPrompt, setShowDownloadPrompt] = useState<string | null>(null);
+  const [showDemo, setShowDemo] = useState(false);
 
   const walletOptions = [
     {
@@ -101,6 +103,31 @@ export default function WalletConnect({ onConnect, onProceed, isConnecting = fal
     setShowDownloadPrompt(null);
   };
 
+  const handleDemoLogin = () => {
+    // Simulate demo login by calling onConnect
+    onConnect();
+  };
+
+  if (showDemo) {
+    return (
+      <div className="min-h-screen bg-gradient-neon-dark flex items-center justify-center p-4">
+        <div className="max-w-md w-full space-y-6">
+          <DemoAccount onDemoLogin={handleDemoLogin} />
+
+          <motion.button
+            onClick={() => setShowDemo(false)}
+            className="w-full glass text-off-white/70 hover:text-primary py-3 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Wallet className="w-4 h-4" />
+            <span>Back to Wallet Connection</span>
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-neon-dark flex items-center justify-center p-4">
       <motion.div
@@ -132,7 +159,7 @@ export default function WalletConnect({ onConnect, onProceed, isConnecting = fal
 
 
         {/* Wallet Options */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-6">
           {walletOptions.map((wallet, index) => (
             <motion.div
               key={wallet.name}
@@ -169,6 +196,37 @@ export default function WalletConnect({ onConnect, onProceed, isConnecting = fal
             </motion.div>
           ))}
         </div>
+
+        {/* Demo Account Option */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mb-8"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-off-white/20" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gradient-neon-dark text-off-white/60">or</span>
+            </div>
+          </div>
+
+          <motion.button
+            onClick={() => setShowDemo(true)}
+            className="w-full mt-4 glass-neon p-4 rounded-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Sparkles className="w-5 h-5 text-primary" />
+            <div className="text-left">
+              <div className="font-semibold text-foreground">Try Demo Account</div>
+              <div className="text-sm text-muted">Experience Ecopay without connecting a wallet</div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-primary" />
+          </motion.button>
+        </motion.div>
 
         {/* Info Box */}
         <motion.div

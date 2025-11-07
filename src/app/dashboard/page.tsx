@@ -14,6 +14,8 @@ import CarbonFootprintTab from "@/components/dashboard/CarbonFootprintTab";
 import AchievementsTab from "@/components/dashboard/AchievementsTab";
 import SettingsTab from "@/components/dashboard/SettingsTab";
 import QuickActions from "@/components/dashboard/QuickActions";
+import TransferModal from "@/components/dashboard/TransferModal";
+import ImpactTab from "@/components/dashboard/ImpactTab";
 import { apiService, User } from "@/lib/api";
 
 const quickStats = [
@@ -46,6 +48,7 @@ const achievements = [
 
 export default function Dashboard() {
   const [showWalletConnect, setShowWalletConnect] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<User | null>(null);
@@ -61,8 +64,17 @@ export default function Dashboard() {
   };
 
   const handleQuickAction = (action: string) => {
-    console.log('Quick action:', action);
-    // Handle quick actions here
+    if (action === 'transfer') {
+      setShowTransferModal(true);
+    } else {
+      console.log('Quick action:', action);
+      // Handle other quick actions here
+    }
+  };
+
+  const handleTransferComplete = () => {
+    // Refresh transactions or update UI
+    window.location.reload();
   };
 
   const handleLogout = () => {
@@ -116,6 +128,16 @@ export default function Dashboard() {
     return <WalletConnect onConnect={handleWalletConnected} />;
   }
 
+  if (showTransferModal) {
+    return (
+      <TransferModal
+        isOpen={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        onTransferComplete={handleTransferComplete}
+      />
+    );
+  }
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -129,11 +151,11 @@ export default function Dashboard() {
             className="space-y-8"
           >
             <QuickStats stats={quickStats} />
+            <ImpactTab onWalletConnect={handleWalletConnect} />
             <div className="grid lg:grid-cols-3 gap-8">
               <TransactionsTab transactions={recentTransactions} />
               <SavingsTab goals={savingsGoals} />
             </div>
-            <CarbonFootprintTab onWalletConnect={handleWalletConnect} />
           </motion.div>
         );
 

@@ -60,6 +60,8 @@ export interface TransactionRequest {
   recipientId: string;
   amount: number;
   description?: string;
+  carbonFootprint?: number;
+  category?: string;
 }
 
 export interface SavingsRequest {
@@ -82,6 +84,8 @@ export interface ProjectRequest {
 export interface OffsetRequest {
   projectId: string;
   amount: number;
+  currency?: 'cUSD' | 'cEUR';
+  co2Offset?: number;
 }
 
 // API Service Class

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, Plus, CreditCard, Target } from "lucide-react";
+import { Award, Plus, ArrowUpRight, Target } from "lucide-react";
 import { apiService } from "@/lib/api";
 
 interface QuickActionsProps {
@@ -11,11 +11,11 @@ interface QuickActionsProps {
 export default function QuickActions({ onAction }: QuickActionsProps) {
   const actions = [
         {
-      label: "Pay Bills",
-      icon: CreditCard,
+      label: "Transfer",
+      icon: ArrowUpRight,
       color: "bg-linear-to-br from-green-500 to-cyan-600",
-      description: "Quick payments",
-      action: "pay-bills"
+      description: "Send money with carbon tracking",
+      action: "transfer"
     },
     {
       label: "Add Funds",
