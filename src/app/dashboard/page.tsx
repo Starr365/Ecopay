@@ -134,7 +134,6 @@ export default function Dashboard() {
               <SavingsTab goals={savingsGoals} />
             </div>
             <CarbonFootprintTab onWalletConnect={handleWalletConnect} />
-            <QuickActions onAction={handleQuickAction} />
           </motion.div>
         );
 
@@ -262,6 +261,13 @@ export default function Dashboard() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
+
+        {/* Quick Actions - Universal (except settings) */}
+        {activeTab !== 'settings' && (
+          <div className="mb-8">
+            <QuickActions onAction={handleQuickAction} />
+          </div>
+        )}
 
         {/* Tab Content */}
         <AnimatePresence mode="wait">

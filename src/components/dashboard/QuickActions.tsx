@@ -10,31 +10,31 @@ interface QuickActionsProps {
 
 export default function QuickActions({ onAction }: QuickActionsProps) {
   const actions = [
-    {
-      label: "Offset Carbon",
-      icon: Award,
-      color: "bg-linear-to-br from-primary to-primary/80",
-      description: "Make an impact now",
-      action: "offset"
-    },
-    {
-      label: "Add Funds",
-      icon: Plus,
-      color: "bg-linear-to-br from-accent to-accent/80",
-      description: "Top up your balance",
-      action: "add-funds"
-    },
-    {
+        {
       label: "Pay Bills",
       icon: CreditCard,
-      color: "bg-linear-to-br from-green-500 to-green-600",
+      color: "bg-linear-to-br from-green-500 to-cyan-600",
       description: "Quick payments",
       action: "pay-bills"
     },
     {
+      label: "Add Funds",
+      icon: Plus,
+      color: "bg-linear-to-br from-green-500 to-cyan-600",
+      description: "Top up your balance",
+      action: "add-funds"
+    },
+    {
+      label: "Offset Carbon",
+      icon: Award,
+      color: "bg-linear-to-br from-green-500 to-cyan-600",
+      description: "Make an impact now",
+      action: "offset"
+    },
+    {
       label: "Set Goals",
       icon: Target,
-      color: "bg-linear-to-br from-purple-500 to-purple-600",
+      color: "bg-linear-to-br from-green-500 to-cyan-600",
       description: "Plan your savings",
       action: "set-goals"
     },
