@@ -1,7 +1,7 @@
 import NextCors from "nextjs-cors";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export async function handleCors(req: NextApiRequest, res: NextApiResponse) {
+export async function handleCors(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   await NextCors(req, res, {
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     origin:
